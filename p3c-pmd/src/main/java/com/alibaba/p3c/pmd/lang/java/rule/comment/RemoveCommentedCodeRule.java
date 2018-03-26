@@ -21,7 +21,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-import com.alibaba.p3c.pmd.lang.java.rule.util.CommentUtils;
+import com.alibaba.p3c.pmd.lang.java.rule.util.NodeSortUtils;
 
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.java.ast.ASTBlockStatement;
@@ -43,6 +43,8 @@ import net.sourceforge.pmd.lang.java.ast.JavaNode;
 public class RemoveCommentedCodeRule extends AbstractAliCommentRule {
 
     private static final Pattern SUPPRESS_PATTERN = Pattern.compile("\\s*///.*", Pattern.DOTALL);
+
+    private static final Pattern PRE_TAG_PATTERN = Pattern.compile(".*<pre>.*", Pattern.DOTALL);
 
     private static final Pattern IMPORT_PATTERN = Pattern.compile(".*import\\s(static\\s)?(\\w*\\.)*\\w*;.*",
         Pattern.DOTALL);
@@ -125,6 +127,11 @@ public class RemoveCommentedCodeRule extends AbstractAliCommentRule {
     protected CommentPatternEnum scanCommentedCode(String content) {
         CommentPatternEnum pattern = CommentPatternEnum.NONE;
 
+        // Skip comment which contains pre tag.
+        if (PRE_TAG_PATTERN.matcher(content).matches()) {
+            return pattern;
+        }
+
         if (IMPORT_PATTERN.matcher(content).matches()) {
             pattern = CommentPatternEnum.IMPORT;
         } else if (FIELD_PATTERN.matcher(content).matches()) {
@@ -144,25 +151,25 @@ public class RemoveCommentedCodeRule extends AbstractAliCommentRule {
 
         List<ASTImportDeclaration> importDecl = cUnit
             .findDescendantsOfType(ASTImportDeclaration.class);
-        CommentUtils.addNodesToSortedMap(itemsByLineNumber, importDecl);
+        NodeSortUtils.addNodesToSortedMap(itemsByLineNumber, importDecl);
 
         List<ASTClassOrInterfaceDeclaration> classDecl = cUnit
             .findDescendantsOfType(ASTClassOrInterfaceDeclaration.class);
-        CommentUtils.addNodesToSortedMap(itemsByLineNumber, classDecl);
+        NodeSortUtils.addNodesToSortedMap(itemsByLineNumber, classDecl);
 
         List<ASTFieldDeclaration> fields = cUnit.findDescendantsOfType(ASTFieldDeclaration.class);
-        CommentUtils.addNodesToSortedMap(itemsByLineNumber, fields);
+        NodeSortUtils.addNodesToSortedMap(itemsByLineNumber, fields);
 
         List<ASTMethodDeclaration> methods = cUnit.findDescendantsOfType(ASTMethodDeclaration.class);
-        CommentUtils.addNodesToSortedMap(itemsByLineNumber, methods);
+        NodeSortUtils.addNodesToSortedMap(itemsByLineNumber, methods);
 
         List<ASTConstructorDeclaration> constructors = cUnit.findDescendantsOfType(ASTConstructorDeclaration.class);
-        CommentUtils.addNodesToSortedMap(itemsByLineNumber, constructors);
+        NodeSortUtils.addNodesToSortedMap(itemsByLineNumber, constructors);
 
         List<ASTBlockStatement> blockStatements = cUnit.findDescendantsOfType(ASTBlockStatement.class);
-        CommentUtils.addNodesToSortedMap(itemsByLineNumber, blockStatements);
+        NodeSortUtils.addNodesToSortedMap(itemsByLineNumber, blockStatements);
 
-        CommentUtils.addNodesToSortedMap(itemsByLineNumber, cUnit.getComments());
+        NodeSortUtils.addNodesToSortedMap(itemsByLineNumber, cUnit.getComments());
 
         return itemsByLineNumber;
     }

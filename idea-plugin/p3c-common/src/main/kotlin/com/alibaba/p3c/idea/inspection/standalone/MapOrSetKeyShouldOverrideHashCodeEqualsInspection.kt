@@ -15,8 +15,8 @@
  */
 package com.alibaba.p3c.idea.inspection.standalone
 
-import com.alibaba.p3c.idea.NumberConstants
-import com.alibaba.p3c.idea.ObjectConstants
+import com.alibaba.p3c.idea.util.NumberConstants
+import com.alibaba.p3c.idea.util.ObjectConstants
 import com.alibaba.p3c.idea.i18n.P3cBundle
 import com.alibaba.p3c.idea.inspection.AliBaseInspection
 import com.alibaba.p3c.idea.util.HighlightDisplayLevels
@@ -171,16 +171,20 @@ class MapOrSetKeyShouldOverrideHashCodeEqualsInspection : BaseInspection, AliBas
 
     companion object {
 
+        private val skipJdkPackageJava = "java."
+        private val skipJdkPackageJavax = "javax."
+
         private fun redefineHashCodeEquals(psiType: PsiType): Boolean {
             if (psiType !is PsiClassType) {
                 return true
             }
-            val psiClass = psiType.resolve()
-            if (psiClass == null || psiClass.containingFile == null || psiClass is PsiTypeParameter
-                    || psiClass.isEnum || psiClass.isInterface) {
-                return true
-            }
-            if (psiClass.containingFile.fileType !is JavaFileType) {
+            val psiClass = psiType.resolve() ?: return false
+            val skip = psiClass.containingFile == null || psiClass is PsiTypeParameter
+                    || psiClass.isEnum || psiClass.isInterface
+                    || psiClass.containingFile.fileType !is JavaFileType
+                    || psiClass.qualifiedName?.startsWith(skipJdkPackageJava) ?: false
+                    || psiClass.qualifiedName?.startsWith(skipJdkPackageJavax) ?: false
+            if (skip) {
                 return true
             }
             val hashCodeMethods = psiClass.findMethodsByName(ObjectConstants.METHOD_NAME_HASHCODE, false)

@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alibaba.smartfox.eclipse.job
-
-import org.eclipse.core.resources.IResource
-import org.eclipse.core.runtime.jobs.ISchedulingRule
+package com.alibaba.p3c.idea.util
 
 /**
- *
- *
  * @author caikang
- * @date 2017/06/14
+ * @date 2016/12/28
  */
-object P3CMutex : ISchedulingRule {
-    override fun contains(rule: ISchedulingRule?): Boolean {
-        return isConflicting(rule)
-    }
-
-    override fun isConflicting(rule: ISchedulingRule?): Boolean {
-        return rule == this || rule is IResource
-    }
+object ObjectConstants {
+    val METHOD_NAME_EQUALS = "equals"
+    val METHOD_NAME_HASHCODE = "hashCode"
+    val METHOD_NAME_ADD = "add"
+    val METHOD_NAME_PUT = "put"
+    val CLASS_LITERAL = "class"
+    val INTERFACE_LITERAL = "interface"
+    val ENUM_LITERAL = "enum"
 }

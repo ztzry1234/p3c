@@ -13,18 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alibaba.p3c.idea;
+package com.alibaba.smartfox.eclipse.job
+
+import org.eclipse.core.runtime.jobs.ISchedulingRule
 
 /**
+ *
+ *
  * @author caikang
- * @date 2016/12/28
+ * @date 2017/06/14
  */
-public interface ObjectConstants {
-    String METHOD_NAME_EQUALS = "equals";
-    String METHOD_NAME_HASHCODE = "hashCode";
-    String METHOD_NAME_ADD = "add";
-    String METHOD_NAME_PUT = "put";
-    String CLASS_LITERAL = "class";
-    String INTERFACE_LITERAL = "interface";
-    String ENUM_LITERAL = "enum";
+object P3cMutex : ISchedulingRule {
+    override fun contains(rule: ISchedulingRule?): Boolean {
+        return isConflicting(rule)
+    }
+
+    override fun isConflicting(rule: ISchedulingRule?): Boolean {
+        return rule == this
+    }
 }

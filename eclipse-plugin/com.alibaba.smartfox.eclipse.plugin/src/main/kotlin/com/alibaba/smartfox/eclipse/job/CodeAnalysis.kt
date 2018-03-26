@@ -61,7 +61,7 @@ object CodeAnalysis {
                     if (monitor.isCanceled) {
                         return@run Status.CANCEL_STATUS
                     }
-                    if(it.isAccessible){
+                    if (it.isAccessible) {
                         it.accept(fileVisitor)
                     }
                 }
@@ -83,8 +83,13 @@ object CodeAnalysis {
                 return Status.OK_STATUS
             }
         }
-        job.rule = P3CMutex
-        job.schedule()
+        job.apply {
+            isUser = true
+            isSystem = false
+            priority = Job.INTERACTIVE
+            rule = P3cMutex
+            schedule()
+        }
     }
 
     fun processFileToMakers(file: IFile, monitor: IProgressMonitor): List<MarkerViolation> {
@@ -92,10 +97,9 @@ object CodeAnalysis {
         val ruleViolations = processFile(file)
 
         MarkerUtil.removeAllMarkers(file)
-        val markers = ruleViolations.map {
+        return ruleViolations.map {
             MarkerViolation(MarkerUtil.addMarker(file, it), it)
         }
-        return markers
     }
 
     private fun processFile(file: IFile): List<RuleViolation> {
